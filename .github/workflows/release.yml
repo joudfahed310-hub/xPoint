@@ -16,17 +16,62 @@ jobs:
       - name: Checkout Code
         uses: actions/checkout@v4
 
-      - name: Fix Manifest Attributes
+      - name: Generate Clean AndroidManifest
         run: |
-          sed -i 's/ uses-permission="/ uses-permission android:name="/g' app/src/main/AndroidManifest.xml
-          sed -i 's/<uses-permission="/<uses-permission android:name="/g' app/src/main/AndroidManifest.xml
-          sed -i 's/<action="/<action android:name="/g' app/src/main/AndroidManifest.xml
-          sed -i 's/<category="/<category android:name="/g' app/src/main/AndroidManifest.xml
-          sed -i 's/<meta-data="/<meta-data android:name="/g' app/src/main/AndroidManifest.xml
-          sed -i 's/<activity="/<activity android:name="/g' app/src/main/AndroidManifest.xml
-          sed -i 's/<service="/<service android:name="/g' app/src/main/AndroidManifest.xml
-          sed -i 's/<property="/<property android:name="/g' app/src/main/AndroidManifest.xml
-          sed -i 's/<provider="/<provider android:name="/g' app/src/main/AndroidManifest.xml
+          cat << 'EOF' > app/src/main/AndroidManifest.xml
+          <?xml version="1.0" encoding="utf-8"?>
+          <manifest xmlns:android="http://android.com"
+              xmlns:tools="http://android.com">
+              <uses-permission android:name="android.permission.INTERNET" />
+              <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+              <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+              <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+              <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />
+              <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+              <uses-permission android:name="android.permission.FOREGROUND_SERVICE_SPECIAL_USE" />
+              <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+              <uses-permission android:name="android.permission.QUERY_ALL_PACKAGES" tools:ignore="QueryAllPackagesPermission" />
+              <queries>
+                  <intent>
+                      <action android:name="io.github.libxposed.IRemoteService" />
+                  </intent>
+              </queries>
+              <application
+                  android:allowBackup="true"
+                  android:icon="@mipmap/ic_launcher"
+                  android:label="@string/app_name"
+                  android:roundIcon="@mipmap/ic_launcher_round"
+                  android:supportsRtl="true"
+                  android:theme="@style/Theme.xPoint">
+                  <meta-data android:name="xposedmodule" android:value="true" />
+                  <meta-data android:name="xposeddescription" android:value="xPoint Pro" />
+                  <meta-data android:name="xposedminversion" android:value="101" />
+                  <meta-data android:name="xposedapi" android:value="101" />
+                  <provider
+                      android:name="io.github.libxposed.service.XposedProvider"
+                      android:authorities="com.hazbu.xpoint.XposedService"
+                      android:exported="true"
+                      tools:ignore="ExportedContentProvider" />
+                  <activity android:name=".MainActivity" android:exported="true">
+                      <intent-filter>
+                          <action android:name="android.intent.action.MAIN" />
+                          <category android:name="android.intent.category.LAUNCHER" />
+                      </intent-filter>
+                  </activity>
+                  <service
+                      android:name=".JoystickService"
+                      android:enabled="true"
+                      android:exported="false"
+                      android:foregroundServiceType="specialUse">
+                      <property android:name="android.app.PROPERTY_SPECIAL_USE_FGS_SUBTYPE" android:value="Joystick" />
+                  </service>
+                  <provider
+                      android:name=".LocationProvider"
+                      android:authorities="com.hazbu.xpoint.provider"
+                      android:exported="true" />
+              </application>
+          </manifest>
+          EOF
 
       - name: Setup Java 21
         uses: actions/setup-java@v4
