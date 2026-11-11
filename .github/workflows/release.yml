@@ -16,6 +16,18 @@ jobs:
       - name: Checkout Code
         uses: actions/checkout@v4
 
+      - name: Fix Manifest Attributes
+        run: |
+          sed -i 's/ uses-permission="/ uses-permission android:name="/g' app/src/main/AndroidManifest.xml
+          sed -i 's/<uses-permission="/<uses-permission android:name="/g' app/src/main/AndroidManifest.xml
+          sed -i 's/<action="/<action android:name="/g' app/src/main/AndroidManifest.xml
+          sed -i 's/<category="/<category android:name="/g' app/src/main/AndroidManifest.xml
+          sed -i 's/<meta-data="/<meta-data android:name="/g' app/src/main/AndroidManifest.xml
+          sed -i 's/<activity="/<activity android:name="/g' app/src/main/AndroidManifest.xml
+          sed -i 's/<service="/<service android:name="/g' app/src/main/AndroidManifest.xml
+          sed -i 's/<property="/<property android:name="/g' app/src/main/AndroidManifest.xml
+          sed -i 's/<provider="/<provider android:name="/g' app/src/main/AndroidManifest.xml
+
       - name: Setup Java 21
         uses: actions/setup-java@v4
         with:
