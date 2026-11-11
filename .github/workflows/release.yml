@@ -16,62 +16,37 @@ jobs:
       - name: Checkout Code
         uses: actions/checkout@v4
 
-      - name: Generate Clean AndroidManifest
+      - name: Write Clean Manifest
         run: |
-          cat << 'EOF' > app/src/main/AndroidManifest.xml
-          <?xml version="1.0" encoding="utf-8"?>
-          <manifest xmlns:android="http://android.com"
-              xmlns:tools="http://android.com">
-              <uses-permission android:name="android.permission.INTERNET" />
-              <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
-              <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
-              <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
-              <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />
-              <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
-              <uses-permission android:name="android.permission.FOREGROUND_SERVICE_SPECIAL_USE" />
-              <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
-              <uses-permission android:name="android.permission.QUERY_ALL_PACKAGES" tools:ignore="QueryAllPackagesPermission" />
-              <queries>
-                  <intent>
-                      <action android:name="io.github.libxposed.IRemoteService" />
-                  </intent>
-              </queries>
-              <application
-                  android:allowBackup="true"
-                  android:icon="@mipmap/ic_launcher"
-                  android:label="@string/app_name"
-                  android:roundIcon="@mipmap/ic_launcher_round"
-                  android:supportsRtl="true"
-                  android:theme="@style/Theme.xPoint">
-                  <meta-data android:name="xposedmodule" android:value="true" />
-                  <meta-data android:name="xposeddescription" android:value="xPoint Pro" />
-                  <meta-data android:name="xposedminversion" android:value="101" />
-                  <meta-data android:name="xposedapi" android:value="101" />
-                  <provider
-                      android:name="io.github.libxposed.service.XposedProvider"
-                      android:authorities="com.hazbu.xpoint.XposedService"
-                      android:exported="true"
-                      tools:ignore="ExportedContentProvider" />
-                  <activity android:name=".MainActivity" android:exported="true">
-                      <intent-filter>
-                          <action android:name="android.intent.action.MAIN" />
-                          <category android:name="android.intent.category.LAUNCHER" />
-                      </intent-filter>
-                  </activity>
-                  <service
-                      android:name=".JoystickService"
-                      android:enabled="true"
-                      android:exported="false"
-                      android:foregroundServiceType="specialUse">
-                      <property android:name="android.app.PROPERTY_SPECIAL_USE_FGS_SUBTYPE" android:value="Joystick" />
-                  </service>
-                  <provider
-                      android:name=".LocationProvider"
-                      android:authorities="com.hazbu.xpoint.provider"
-                      android:exported="true" />
+          python3 -c '
+          h = "http" + "://schemas.android" + ".com/apk/res/android"
+          t = "http" + "://schemas.android" + ".com/tools"
+          a = "android" + ":name"
+          xml = f"""<?xml version="1.0" encoding="utf-8"?>
+          <manifest xmlns:android="{h}" xmlns:tools="{t}">
+              <uses-permission {a}="android.permission.INTERNET" />
+              <uses-permission {a}="android.permission.ACCESS_NETWORK_STATE" />
+              <uses-permission {a}="android.permission.ACCESS_FINE_LOCATION" />
+              <uses-permission {a}="android.permission.ACCESS_COARSE_LOCATION" />
+              <uses-permission {a}="android.permission.SYSTEM_ALERT_WINDOW" />
+              <uses-permission {a}="android.permission.FOREGROUND_SERVICE" />
+              <uses-permission {a}="android.permission.FOREGROUND_SERVICE_SPECIAL_USE" />
+              <uses-permission {a}="android.permission.POST_NOTIFICATIONS" />
+              <uses-permission {a}="android.permission.QUERY_ALL_PACKAGES" tools:ignore="QueryAllPackagesPermission" />
+              <queries><intent><action {a}="io.github.libxposed.IRemoteService" /></intent></queries>
+              <application android:allowBackup="true" android:icon="@mipmap/ic_launcher" android:label="@string/app_name" android:roundIcon="@mipmap/ic_launcher_round" android:supportsRtl="true" android:theme="@style/Theme.xPoint">
+                  <meta-data {a}="xposedmodule" android:value="true" />
+                  <meta-data {a}="xposeddescription" android:value="xPoint Pro" />
+                  <meta-data {a}="xposedminversion" android:value="101" />
+                  <meta-data {a}="xposedapi" android:value="101" />
+                  <provider {a}="io.github.libxposed.service.XposedProvider" android:authorities="com.hazbu.xpoint.XposedService" android:exported="true" tools:ignore="ExportedContentProvider" />
+                  <activity {a}=".MainActivity" android:exported="true"><intent-filter><action {a}="android.intent.action.MAIN" /><category {a}="android.intent.category.LAUNCHER" /></intent-filter></activity>
+                  <service {a}=".JoystickService" android:enabled="true" android:exported="false" android:foregroundServiceType="specialUse"><property {a}="android.app.PROPERTY_SPECIAL_USE_FGS_SUBTYPE" android:value="Joystick" /></service>
+                  <provider {a}=".LocationProvider" android:authorities="com.hazbu.xpoint.provider" android:exported="true" />
               </application>
-          </manifest>
-          EOF
+          </manifest>"""
+          open("app/src/main/AndroidManifest.xml", "w").write(xml)
+          '
 
       - name: Setup Java 21
         uses: actions/setup-java@v4
