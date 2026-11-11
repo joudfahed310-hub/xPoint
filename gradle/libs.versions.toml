@@ -7,6 +7,7 @@ espressoCore = "3.7.0"
 appcompat = "1.7.1"
 material = "1.14.0"
 libxposed = "101.0.0"
+osmdroid = "6.1.18"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -17,7 +18,7 @@ androidx-appcompat = { group = "androidx.appcompat", name = "appcompat", version
 material = { group = "com.google.android.material", name = "material", version.ref = "material" }
 libxposed-api = { group = "io.github.libxposed", name = "api", version.ref = "libxposed" }
 libxposed-service = { group = "io.github.libxposed", name = "service", version.ref = "libxposed" }
+osmdroid-android = { group = "org.osmdroid", name = "osmdroid-android", version.ref = "osmdroid" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
-
